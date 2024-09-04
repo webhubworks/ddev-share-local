@@ -1,0 +1,7 @@
+#ddev-generated
+# Expose vite port in web container
+services:
+  web:
+    expose:
+      - '5173'
+

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+## #ddev-generated
+## Description: Share the project locally using nip.io wildcard DNS
+## Usage: share-local
+## Example: ddev share-local
+
+LOCAL_IP=$(ipconfig getifaddr en0)
+NIP_HOST="$DDEV_SITENAME.$LOCAL_IP.nip.io"
+NIP_URL="https://$NIP_HOST"
+
+printf "Local IP: %s\nLocal URL: %s\n" $LOCAL_IP $NIP_URL
+
+ddev config --additional-fqdns=$NIP_HOST
+ddev start --skip-hooks
+
+# Save the current environment variable name
+if [ $DDEV_PROJECT_TYPE == "laravel" ]; then
+  ENV_NAME="APP_URL"
+elif [ $DDEV_PROJECT_TYPE == "craftcms" ]; then
+  ENV_NAME="PRIMARY_SITE_URL"
+fi
+
+# Save current URL
+RESTORE_URL=$(grep "^$ENV_NAME=" .env | cut -d '=' -f2-)
+
+# Restore original URL before process exits
+restore_env_url() {
+  sed -i "" "s|^$ENV_NAME=.*|$ENV_NAME=$RESTORE_URL|" .env
+  printf "\nRestored original URL: %s" $RESTORE_URL
+}
+
+trap restore_env_url EXIT
+
+# Update the site URL in the .env file
+sed -i "" "s|^$ENV_NAME=.*|$ENV_NAME=$NIP_URL|" .env
+
+# Start dev server
+if [ $DDEV_PROJECT_TYPE == "laravel" ]; then
+  ddev exec SHARE_URL="$NIP_URL" npm run dev -- --host
+elif [ $DDEV_PROJECT_TYPE == "craftcms" ]; then
+  ddev exec SHARE_URL="$NIP_URL" npm run dev -- --host
+fi
