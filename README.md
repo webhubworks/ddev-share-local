@@ -35,3 +35,7 @@ export default defineConfig({
    // …
 });
 ```
+
+## Safari on iPhone
+Out-of-the-box there will be CORS errors when opening the nip.io url on Safari on your iPhone. \
+To solve this, `cd /etc/ssl/certs/` and `cat master.crt`. Copy its contents into a new e.g. `ddevmaster.crt` and airdrop it to your iPhone. In the iPhone's settings you will have to confirm and install this certificate (profile).
