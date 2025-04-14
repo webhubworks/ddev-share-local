@@ -22,11 +22,15 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,
-        origin: `${url.origin}:5173`,
+        origin: `https://${url.host}:5173`,
         hmr: {
             protocol: "wss",
             host: url.host
-        }
+        },
+        cors: {
+            origin: /^https?:\/\/(?:[a-zA-Z0-9-]+\.)+(ddev\.site|nip\.io)(?::\d+)?$/,
+        },
+        allowedHosts: ['.ddev.site', '.nip.io'],
     },
    // …
 });
