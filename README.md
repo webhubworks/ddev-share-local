@@ -14,7 +14,9 @@ Bind Vite to all interfaces and set the correct origin when currently sharing:
 ```js
 // vite.config.js
 
-const url = new URL(process.env.SHARE_URL ?? process.env.DDEV_PRIMARY_URL)
+const rawUrl = null //process.env.SHARE_URL ?? process.env.DDEV_PRIMARY_URL;
+const url = rawUrl ? new URL(rawUrl) : null;
+const urlHost = url?.host ?? 'localhost';
 
 export default defineConfig({
    // …
@@ -22,10 +24,10 @@ export default defineConfig({
         host: '0.0.0.0',
         port: 5173,
         strictPort: true,
-        origin: `https://${url.host}:5173`,
+        origin: `https://${urlHost}:5173`,
         hmr: {
             protocol: "wss",
-            host: url.host
+            host: urlHost
         },
         cors: {
             origin: /^https?:\/\/(?:[a-zA-Z0-9-]+\.)+(ddev\.site|nip\.io)(?::\d+)?$/,
